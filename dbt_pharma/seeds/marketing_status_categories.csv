@@ -1,0 +1,5 @@
+marketing_status,category,description
+Prescription,Active,Lék dostupný pouze na předpis
+Over-the-counter,Active,Lék dostupný bez předpisu
+Discontinued,Inactive,Lék stažen z trhu
+None,Unknown,Status není znám
