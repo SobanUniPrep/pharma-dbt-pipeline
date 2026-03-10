@@ -10,6 +10,8 @@ from config import (
     SNOWFLAKE_DATABASE
 )
 from extract import get_drug_applications
+import pandas as pd
+from snowflake.connector.pandas_tools import write_pandas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,15 +39,35 @@ def setup_schema(cursor):
         )
     """)
 
-def load_data(cursor, records):
-    logging.info(f"Nahrávám {len(records)} záznamů do DRUG_APPLICATIONS")
+# def load_data(cursor, records):
+#     logging.info(f"Nahrávám {len(records)} záznamů do DRUG_APPLICATIONS")
+#     loaded_at = datetime.now().isoformat()
+#     for record in records:
+#         cursor.execute(
+#             "INSERT INTO DRUG_APPLICATIONS (loaded_at, data) SELECT %s, PARSE_JSON(%s)",
+#             (loaded_at, json.dumps(record))
+#         )
+#     logging.info("Nahrávání dokončeno")
+
+def load_data(conn, records):
+    logging.info(f"Připravuji {len(records)} záznamů pro nahrání")
     loaded_at = datetime.now().isoformat()
-    for record in records:
-        cursor.execute(
-            "INSERT INTO DRUG_APPLICATIONS (loaded_at, data) SELECT %s, PARSE_JSON(%s)",
-            (loaded_at, json.dumps(record))
-        )
-    logging.info("Nahrávání dokončeno")
+    
+    df = pd.DataFrame([{
+        "LOADED_AT": loaded_at,
+        "DATA": json.dumps(record)
+    } for record in records])
+    
+    success, nchunks, nrows, _ = write_pandas(
+        conn=conn,
+        df=df,
+        table_name="DRUG_APPLICATIONS",
+        schema="RAW",
+        overwrite=False
+    )
+    
+    logging.info(f"Nahráno {nrows} záznamů v {nchunks} chuncích")
+
 
 if __name__ == "__main__":
     conn = get_snowflake_connection()
