@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: stg_drug_applications
+    columns:
+      - name: application_number
+        tests:
+          - not_null
+          - unique
+      - name: sponsor_name
+        tests:
+          - not_null
+
+  - name: stg_drug_products
+    columns:
+      - name: application_number
+        tests:
+          - not_null
+      - name: active_ingredient
+        tests:
+          - not_null
+
+  - name: stg_drug_submissions
+    columns:
+      - name: application_number
+        tests:
+          - not_null
+      - name: submission_number
+        tests:
+          - not_null
+      - name: submission_status
+        tests:
+          - not_null

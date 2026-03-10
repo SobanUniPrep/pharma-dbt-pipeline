@@ -4,6 +4,6 @@ WITH source AS (
 )
 
 SELECT 
-    data:application_number::STRING AS application_number,
+    {{ clean_application_number('data:application_number::STRING') }} AS application_number,
     data:sponsor_name::STRING AS sponsor_name
 FROM source
